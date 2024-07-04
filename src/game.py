@@ -1,5 +1,7 @@
 import pygame
 from sys import exit
+import random
+from card import *
 
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080))
@@ -7,11 +9,32 @@ pygame.display.set_caption("Crawler")
 clock = pygame.time.Clock()
 dt = 0
 
+mousePos = pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) # set the mouse pos to mouse
 
-player_pos = pygame.Vector2(screen.get_width() / 2, 1000)
-ball_pos = pygame.Vector2(screen.get_width() // 2, screen.get_height() //2)
-ball_hb_pos = pygame.Vector2((screen.get_width() // 2) - 15 , (screen.get_height() //2) - 15)
-ball_direction = pygame.Vector2(screen.get_width() / 2, 1080)
+image = pygame.image.load("./crawler/assets/EmptyCard.png") #load an image
+image.convert() #convert image for quicker reading
+image2 = pygame.image.load("./crawler/assets/EmptyCard2.png")
+image2.convert()
+
+#rect = image.get_rect() #get the rectangle of the image
+#rect.center = screen.get_width() / 2, screen.get_height() /2 #put the card in the center
+
+dealer = Dealer()
+deck = dealer.makeStandardDeck()
+hand = Deck()
+x = 1
+while x <= 7:
+    hand.addCard(deck.draw())
+    x += 1
+
+
+i = 0.0
+for card in hand:
+    card.setImage(image)
+    card.setRect(image.get_rect())
+    card.getRect().center = (screen.get_width() * 0.20) + i, screen.get_height() * 0.85
+    i = i + 200.0
+    click = False
 
 
 while True:
@@ -19,44 +42,37 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-
-    pygame.display.update()
-    screen.fill("black")
-
-    paddle = pygame.Rect(player_pos,(80,20))
-    ball_hitbox = pygame.Rect(ball_hb_pos, (30,30))
-    pygame.draw.rect(screen, "white", paddle)
-
-    pygame.draw.circle(screen, "white", ball_pos, 20)
-    pygame.draw.rect(screen,"red", ball_hitbox)
-
-    isMovingLeft = False
-    ifMovingRight = False
-    isStationary = True
-
-    keys = pygame.key.get_pressed()  
-    if keys[pygame.K_a]:
-        if player_pos.x >= 20:
-            player_pos.x -= 500 * dt
-            isMovingLeft = True
-    if keys[pygame.K_d]:
-        if player_pos.x <= 1840:
-            player_pos.x += 500 * dt
-            isMovingRight = True
-
-    if ball_hitbox.colliderect(paddle):
-        ball_direction = pygame.Vector2(screen.get_width() / 2, 10)
-    if ball_hitbox.y <= 1:
-        ball_direction = pygame.Vector2(screen.get_width() / 2, 1080)
-    if ball_hitbox.y >= (screen.get_height() - 50):
-        pygame.quit()
-        exit()       
     
-    ball_pos = ball_pos.move_towards(ball_direction, 5)
-    ball_hb_pos.x = ball_pos.x - 15
-    ball_hb_pos.y = ball_pos.y - 15
+    screen.fill((20, 74, 34)) #refresh the background
 
-    pygame.display.flip()
-    dt = clock.tick(60) / 1000
+    currentlyPressed = pygame.mouse.get_pressed()[0]
 
-pygame.quit()
+    mouse = pygame.Rect(mousePos, (10,10)) #update the mouse hitbox
+    mousePos = pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) #update mouse position
+    
+
+    for card in hand:
+        screen.blit(card.getImage(), card.getRect())
+        if mouse.colliderect(card.getRect()) and currentlyPressed and not previouslyPressed: #if mouse is over the card and lclick
+            #card.getRect().center = mousePos
+            if card.getSelected():
+                card.setImage(image)
+                card.select()
+            else:
+                card.setImage(image2)
+                card.select()
+
+    previouslyPressed = currentlyPressed
+
+
+    
+    #screen.blit(image, rect) #draw the card
+    #pygame.draw.rect(screen, "red", mouse) #draw the mouse hitbox
+
+
+    
+
+    pygame.display.update() #update the display
+    #pygame.display.flip() #???
+    dt = clock.tick(60) / 1000 #delta time at 60fps
+
