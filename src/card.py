@@ -79,8 +79,8 @@ class Dealer():
 
     def makeStandardDeck(self):   # could be a class? DeckBuilder?
         deck = Deck()
-        suitList = ["Spades","Hearts","Diamonds","Clubs"]
-        rankList = ["Ace","2","3","4","5","6","7","8","9","10","Jack","Queen","King"]
+        suitList = ["spades","hearts","diamonds","clubs"]
+        rankList = ["ace","2","3","4","5","6","7","8","9","10","jack","queen","king"]
         for suit in suitList:
             for rank in rankList:
                 card = Card(suit,rank)
@@ -89,7 +89,6 @@ class Dealer():
 
 class Hand(Deck): 
     pass
-
 
 class PlayArea(Deck): 
     pass

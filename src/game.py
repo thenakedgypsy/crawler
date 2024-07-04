@@ -11,31 +11,27 @@ dt = 0
 
 mousePos = pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) # set the mouse pos to mouse
 
-image = pygame.image.load("./crawler/assets/EmptyCard.png") #load an image
-image.convert() #convert image for quicker reading
-image2 = pygame.image.load("./crawler/assets/EmptyCard2.png")
-image2.convert()
 
-#rect = image.get_rect() #get the rectangle of the image
-#rect.center = screen.get_width() / 2, screen.get_height() /2 #put the card in the center
 
 dealer = Dealer()
 deck = dealer.makeStandardDeck()
 hand = Deck()
+deck.shuffle()
 x = 1
 while x <= 7:
     hand.addCard(deck.draw())
     x += 1
 
-
 i = 0.0
 for card in hand:
-    card.setImage(image)
-    card.setRect(image.get_rect())
+    card.setImage(pygame.image.load(f"./crawler/assets/{card.getRank()}_of_{card.getSuit()}.png"))
+    card.getImage().convert()
+    card.setRect(card.getImage().get_rect())
     card.getRect().center = (screen.get_width() * 0.20) + i, screen.get_height() * 0.85
     i = i + 200.0
-    click = False
 
+
+numSelected = 0
 
 while True:
     for event in pygame.event.get(): #quit checker
@@ -45,32 +41,25 @@ while True:
     
     screen.fill((20, 74, 34)) #refresh the background
 
-    currentlyPressed = pygame.mouse.get_pressed()[0]
-
     mouse = pygame.Rect(mousePos, (10,10)) #update the mouse hitbox
     mousePos = pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) #update mouse position
-    
+        
+    currentlyPressed = pygame.mouse.get_pressed()[0]
 
     for card in hand:
         screen.blit(card.getImage(), card.getRect())
         if mouse.colliderect(card.getRect()) and currentlyPressed and not previouslyPressed: #if mouse is over the card and lclick
             #card.getRect().center = mousePos
             if card.getSelected():
-                card.setImage(image)
+                card.getRect().y += 50
                 card.select()
-            else:
-                card.setImage(image2)
+                numSelected -= 1
+            elif numSelected < 5:
+                numSelected += 1
+                card.getRect().y -= 50
                 card.select()
 
     previouslyPressed = currentlyPressed
-
-
-    
-    #screen.blit(image, rect) #draw the card
-    #pygame.draw.rect(screen, "red", mouse) #draw the mouse hitbox
-
-
-    
 
     pygame.display.update() #update the display
     #pygame.display.flip() #???
