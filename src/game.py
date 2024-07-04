@@ -11,29 +11,25 @@ dt = 0
 
 mousePos = pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) # set the mouse pos to mouse
 
-
-
 dealer = Dealer()
 deck = dealer.makeStandardDeck()
 hand = Deck()
 deck.shuffle()
-x = 1
-while x <= 7:
-    hand.addCard(deck.draw())
-    x += 1
-
-i = 0.0
-for card in hand:
+for card in deck:
     card.setImage(pygame.image.load(f"./crawler/assets/{card.getRank()}_of_{card.getSuit()}.png"))
     card.getImage().convert()
     card.setRect(card.getImage().get_rect())
-    card.getRect().center = (screen.get_width() * 0.20) + i, screen.get_height() * 0.85
-    i = i + 200.0
+while len(hand) < 7:
+    hand.addCard(deck.draw())
+pusher = 0.0
+for card in hand: 
+    card.getRect().center = (screen.get_width() * 0.20) + pusher, screen.get_height() * 0.85
+    pusher = pusher + 200.0
 
 
 numSelected = 0
 
-while True:
+while True: #main loop
     for event in pygame.event.get(): #quit checker
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -59,7 +55,7 @@ while True:
                 card.getRect().y -= 50
                 card.select()
 
-    previouslyPressed = currentlyPressed
+    previouslyPressed = currentlyPressed #stop mouse triggering whilst held
 
     pygame.display.update() #update the display
     #pygame.display.flip() #???

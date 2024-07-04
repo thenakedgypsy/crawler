@@ -1,5 +1,5 @@
 import random
-import pygame
+
 
 class Card:
     def __init__(self, suit, rank): #initialise a card with a suit and rank
@@ -74,10 +74,14 @@ class Deck:
 
     def __iter__(self): #makes the deck iterable
         return iter(self.__cardsInDeck)
+    
+    def __len__(self):
+        return len(self.__cardsInDeck)
+
 
 class Dealer():
 
-    def makeStandardDeck(self):   # could be a class? DeckBuilder?
+    def makeStandardDeck(self):   #makes a standard deck
         deck = Deck()
         suitList = ["spades","hearts","diamonds","clubs"]
         rankList = ["ace","2","3","4","5","6","7","8","9","10","jack","queen","king"]
