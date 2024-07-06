@@ -79,7 +79,7 @@ while True: #main loop
             if card.getSelected():
                 numSelected += 1
             if card.getBlit():
-                pygame.time.delay(200)
+                pygame.time.delay(175)
                 screen.blit(card.getImage(), card.getRect())
                 cardSound.play()
                 pygame.display.update()
@@ -87,7 +87,6 @@ while True: #main loop
             else:
                 screen.blit(card.getImage(), card.getRect())
             if mouse.colliderect(card.getRect()) and currentlyPressed and not previouslyPressed: #if mouse is over the card and lclick
-                #card.getRect().center = mousePos
                 if card.getSelected():
                     card.getRect().y += 50
                     pushSound.play()
@@ -97,20 +96,17 @@ while True: #main loop
                     pushSound.play()
                     card.select()
 
-
     if gameState == "evaluate":
+        
         pusher = 0.0
-
-
         for card in hand:
             screen.blit(card.getImage(), card.getRect())
         
-        for card in playArea:
-             
+        for card in playArea:             
             card.getRect().center = (screen.get_width() * 0.20) + pusher, screen.get_height() * 0.4
             pusher = pusher + 200.0 
             if card.getBlit():
-                pygame.time.delay(200)
+                pygame.time.delay(175)
                 screen.blit(card.getImage(), card.getRect())
                 cardSound.play()
                 pygame.display.update()
