@@ -6,6 +6,20 @@ class Card:
         self.__suit = suit
         self.__rank = rank
         self.__selected = False
+        if self.__rank == "ace":
+            self.value = 14
+        elif self.__rank == "king":
+            self.value = 13
+        elif self.__rank == "queen":
+            self.value = 12
+        elif self.__rank == "jack":
+            self.value = 11
+        else:
+            self.value = int(self.getRank())
+
+    def getValue(self):
+        return self.value
+
 
     def setSuit(self, suit): # sets the card suit
         self.__suit = suit
@@ -39,6 +53,10 @@ class Card:
 
     def getSelected(self):
         return self.__selected
+    
+    def __lt__(self,other):
+        return self.value < other.value
+
 
 class Deck:
     def __init__(self):#initialises object with a list
@@ -95,7 +113,55 @@ class Hand(Deck):
     pass
 
 class PlayArea(Deck): 
-    pass
+    
+    def evaluate(self):
+        if self.flushCheck() and self.straightCheck():
+            return "straightflush"
+        if self.flushCheck():
+            return "flush"
+        if self.straightCheck():
+            return "straight"
+        if self.fourCheck():
+            return "fourkind"
+                
+
+
+    def fourCheck(self):
+        for card in self.__cardsInDeck:
+            cardsSame = 0
+            searchedRank = card.getRank()
+            for card in self.__cardsInDeck:
+                if card.getRank() == searchedRank:
+                    cardsSame +=1
+            if cardsSame == 4:
+                return True
+            return False      
+                
+                                
+
+    def flushCheck(self):
+        numSame = 0
+        suit = self.__cardsInDeck[0].getSuit()
+        for card in self.__cardsInDeck():
+            if card.getSuit() == suit:
+                numSame +=1
+        if numSame == 5:
+            return True
+        return False
+
+
+    def straightCheck(self):
+        sortedDeck = sorted(self.__cardsInDeck)
+        i = 0
+        inSeries = 0
+        while i < 5:
+            if sortedDeck.getCard(i).getValue() + 1 == sortedDeck.getCard(i+1):
+                inSeries +=1
+            else:
+                return False
+            i += 1
+        return True                                                         
+
 
 
 
