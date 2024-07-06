@@ -4,6 +4,7 @@ import random
 from card import *
 
 pygame.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode((1920, 1080))
 pygame.display.set_caption("Crawler")
 clock = pygame.time.Clock()
@@ -27,8 +28,13 @@ playButton = pygame.image.load("./crawler/assets/playButton.png")
 playRect = playButton.get_rect()
 playRect.center = (screen.get_width() * 0.08, screen.get_height() * 0.85)
 
+cardSound = pygame.mixer.Sound("./crawler/assets/cardDown.mp3")
+pushSound = pygame.mixer.Sound("./crawler/assets/push.mp3")
+
 played = False
 gameState = "draw"
+
+
 while True: #main loop
     for event in pygame.event.get(): #quit checker
         if event.type == pygame.QUIT:
@@ -53,14 +59,16 @@ while True: #main loop
         gameState = "play"
 
     if gameState == "play":
+
         if mouse.colliderect(playRect) and currentlyPressed and not previouslyPressed:
-            print("clicked!")
             handCopy = list(hand) #create a copy of the hand to avoid issues removing whilst iterating
             for card in handCopy:    
                 if card.getSelected():
                     played = True
                     playArea.addCard(card)
                     hand.remove(card)
+            for card in playArea:
+                card.setBlit(True)
 
             if played == True:
                 gameState = "evaluate"
@@ -70,14 +78,23 @@ while True: #main loop
         for card in hand:
             if card.getSelected():
                 numSelected += 1
-            screen.blit(card.getImage(), card.getRect())
+            if card.getBlit():
+                pygame.time.delay(200)
+                screen.blit(card.getImage(), card.getRect())
+                cardSound.play()
+                pygame.display.update()
+                card.setBlit(False)               
+            else:
+                screen.blit(card.getImage(), card.getRect())
             if mouse.colliderect(card.getRect()) and currentlyPressed and not previouslyPressed: #if mouse is over the card and lclick
                 #card.getRect().center = mousePos
                 if card.getSelected():
                     card.getRect().y += 50
+                    pushSound.play()
                     card.select()
                 elif numSelected < 5:
                     card.getRect().y -= 50
+                    pushSound.play()
                     card.select()
 
 
@@ -88,12 +105,14 @@ while True: #main loop
         for card in hand:
             screen.blit(card.getImage(), card.getRect())
         
-        for card in playArea: 
+        for card in playArea:
+             
             card.getRect().center = (screen.get_width() * 0.20) + pusher, screen.get_height() * 0.4
             pusher = pusher + 200.0 
             if card.getBlit():
                 pygame.time.delay(200)
                 screen.blit(card.getImage(), card.getRect())
+                cardSound.play()
                 pygame.display.update()
                 card.setBlit(False)
                 
