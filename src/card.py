@@ -61,10 +61,10 @@ class Card:
         if self.getSuit() == other.getSuit():
             return self.getRank() == other.getRank()
 
-    def getBlit(self):
+    def getBlit(self): #check the status of the "FirstBlit variable. True = needs first time blit, False = already blitted"
         return self.firstBlit
     
-    def setBlit(self, bool):
+    def setBlit(self, bool): #takes a bool and updates FirstBlit 
         self.firstBlit = bool
     
 
@@ -110,22 +110,26 @@ class Deck:
     def __iter__(self): #makes the deck iterable
         return iter(self.__cardsInDeck)
     
-    def __len__(self):
+    def __len__(self): 
         return len(self.__cardsInDeck)
     
-    def evaluate(self):
+    def evaluate(self): #checks for all handtypes
         if self.flushCheck() and self.straightCheck():
             return "straightflush"
-        if self.flushCheck():
+        elif self.flushCheck():
             return "flush"
-        if self.straightCheck():
+        elif self.straightCheck():
             return "straight"
-        if self.fourCheck():
+        elif self.fourCheck():
             return "fourkind"
-        if self.threeCheck():
+        elif self.threeCheck():
             return "threekind"
+        elif self.twoCheck():
+            return "twokind"
+        else:
+            return "highcard"
 
-    def fourCheck(self):
+    def fourCheck(self): #checks for fourofakind
         for card in self.__cardsInDeck:
             cardsSame = 0
             searchedRank = card.getRank()
@@ -136,7 +140,7 @@ class Deck:
                 return True
             return False 
 
-    def threeCheck(self):
+    def threeCheck(self): #checks for three of a kind
         for card in self.__cardsInDeck:
             cardsSame = 0
             searchedRank = card.getRank()
@@ -147,7 +151,7 @@ class Deck:
                 return True
             return False       
         
-    def twoCheck(self):
+    def twoCheck(self): #checks for a pair
         for card in self.__cardsInDeck:
             cardsSame = 0
             searchedRank = card.getRank()
@@ -158,7 +162,7 @@ class Deck:
                 return True
             return False       
 
-    def flushCheck(self):
+    def flushCheck(self): #checks for a flush
         numSame = 0
         suit = self.__cardsInDeck[0].getSuit()
         for card in self.__cardsInDeck():
@@ -168,8 +172,7 @@ class Deck:
             return True
         return False
 
-
-    def straightCheck(self):
+    def straightCheck(self): #checks for a straight
         sortedDeck = sorted(self.__cardsInDeck)
         i = 0
         inSeries = 0
@@ -181,7 +184,7 @@ class Deck:
             i += 1
         return True                        
 
-class Dealer():
+class Dealer(): #dealer class for creating decks
 
     def makeStandardDeck(self):   #makes a standard deck
         deck = Deck()
