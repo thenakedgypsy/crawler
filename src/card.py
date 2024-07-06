@@ -16,10 +16,10 @@ class Card:
             self.value = 11
         else:
             self.value = int(self.getRank())
+        self.firstBlit = True
 
-    def getValue(self):
+    def getValue(self):#returns the value
         return self.value
-
 
     def setSuit(self, suit): # sets the card suit
         self.__suit = suit
@@ -33,29 +33,40 @@ class Card:
     def getRank(self): #returns the card rank
         return self.__rank
     
-    def setImage(self, image):
+    def setImage(self, image): #sets an image to this card
         self.image = image
 
-    def getImage(self):
+    def getImage(self):#returns the image of this card
         return self.image
     
-    def setRect(self, rect):
+    def setRect(self, rect):#sets its shape
         self.rect = rect
 
-    def getRect(self):
+    def getRect(self): #returrns its shape
         return self.rect#
     
-    def select(self):
+    def select(self):#sets the card as selected or unselected
         if self.__selected:
             self.__selected = False
         else:
             self.__selected = True
 
-    def getSelected(self):
+    def getSelected(self): #returns the selection state
         return self.__selected
     
-    def __lt__(self,other):
+    def __lt__(self,other): #lessthan
         return self.value < other.value
+    
+    def __eq__(self,other):
+        if self.getSuit() == other.getSuit():
+            return self.getRank() == other.getRank()
+
+    def getBlit(self):
+        return self.firstBlit
+    
+    def setBlit(self, bool):
+        self.firstBlit = bool
+    
 
 
 class Deck:
@@ -77,6 +88,12 @@ class Deck:
     def discard(self,index): #removes a card from the deck at index
         del self.__cardsInDeck[index]
 
+    def remove(self,card):
+        if card in self.__cardsInDeck:
+            self.__cardsInDeck.remove(card)
+        else:
+            raise Exception("Deck does not contain that card")
+
     def getDeckSize(self): #returns the number of cards in the deck
         return len(self.__cardsInDeck) -1
 
@@ -95,24 +112,6 @@ class Deck:
     
     def __len__(self):
         return len(self.__cardsInDeck)
-
-
-class Dealer():
-
-    def makeStandardDeck(self):   #makes a standard deck
-        deck = Deck()
-        suitList = ["spades","hearts","diamonds","clubs"]
-        rankList = ["ace","2","3","4","5","6","7","8","9","10","jack","queen","king"]
-        for suit in suitList:
-            for rank in rankList:
-                card = Card(suit,rank)
-                deck.addCard(card)
-        return deck
-
-class Hand(Deck): 
-    pass
-
-class PlayArea(Deck): 
     
     def evaluate(self):
         if self.flushCheck() and self.straightCheck():
@@ -123,8 +122,8 @@ class PlayArea(Deck):
             return "straight"
         if self.fourCheck():
             return "fourkind"
-                
-
+        if self.threeCheck():
+            return "threekind"
 
     def fourCheck(self):
         for card in self.__cardsInDeck:
@@ -135,9 +134,29 @@ class PlayArea(Deck):
                     cardsSame +=1
             if cardsSame == 4:
                 return True
-            return False      
-                
-                                
+            return False 
+
+    def threeCheck(self):
+        for card in self.__cardsInDeck:
+            cardsSame = 0
+            searchedRank = card.getRank()
+            for card in self.__cardsInDeck:
+                if card.getRank() == searchedRank:
+                    cardsSame +=1
+            if cardsSame == 3:
+                return True
+            return False       
+        
+    def twoCheck(self):
+        for card in self.__cardsInDeck:
+            cardsSame = 0
+            searchedRank = card.getRank()
+            for card in self.__cardsInDeck:
+                if card.getRank() == searchedRank:
+                    cardsSame +=1
+            if cardsSame == 2:
+                return True
+            return False       
 
     def flushCheck(self):
         numSame = 0
@@ -154,13 +173,32 @@ class PlayArea(Deck):
         sortedDeck = sorted(self.__cardsInDeck)
         i = 0
         inSeries = 0
-        while i < 5:
-            if sortedDeck.getCard(i).getValue() + 1 == sortedDeck.getCard(i+1):
+        while i < len(self.__cardsInDeck):
+            if sortedDeck.getCard(i).getValue() + 1 == sortedDeck.getCard(i+1.).getValue():
                 inSeries +=1
             else:
                 return False
             i += 1
-        return True                                                         
+        return True                        
+
+class Dealer():
+
+    def makeStandardDeck(self):   #makes a standard deck
+        deck = Deck()
+        suitList = ["spades","hearts","diamonds","clubs"]
+        rankList = ["ace","2","3","4","5","6","7","8","9","10","jack","queen","king"]
+        for suit in suitList:
+            for rank in rankList:
+                card = Card(suit,rank)
+                deck.addCard(card)
+        return deck
+
+
+
+
+
+
+                                    
 
 
 
