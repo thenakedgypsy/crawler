@@ -1,3 +1,3 @@
 # crawler
 
-unknown project
+Poker hand simulator
