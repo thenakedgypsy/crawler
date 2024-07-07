@@ -5,6 +5,7 @@ class Card:
     def __init__(self, suit, rank): #initialise a card with a suit and rank
         self.__suit = suit
         self.__rank = rank
+        self.altValue = None
         self.__selected = False
         if self.__rank == "ace":
             self.value = 14
@@ -20,6 +21,9 @@ class Card:
 
     def getValue(self):#returns the value
         return self.value
+    
+    def setValue(self, value):
+        self.value = value
 
     def setSuit(self, suit): # sets the card suit
         self.__suit = suit
@@ -122,12 +126,54 @@ class Deck:
             return "straight"
         elif self.fourCheck():
             return "fourkind"
+        elif self.fullHouseCheck():
+            return "fullhouse"
+        elif self.twoPairCheck():
+            return "twopair"
         elif self.threeCheck():
             return "threekind"
         elif self.twoCheck():
-            return "twokind"
+            return "pair"
         else:
             return "highcard"
+
+    def twoPairCheck(self):
+        valueCounts = {}
+        for card in self.__cardsInDeck:
+            value = card.getValue()
+            if value in valueCounts:
+                valueCounts[value] +=1
+            else:
+                valueCounts[value] = 1
+        pairs = 0
+        for count in valueCounts.values():
+            if count >= 2:
+                pairs +=1
+        if pairs >= 2:
+            return True
+        else:
+            return False
+                
+    def fullHouseCheck(self):
+        valueCounts = {}
+        for card in self.__cardsInDeck:
+            value = card.getValue()
+            if value in valueCounts:
+                valueCounts[value] +=1
+            else:
+                valueCounts[value] = 1
+        pairs = 0
+        trips = 0
+        for count in valueCounts.values():
+            if count == 2:
+                pairs +=1
+            if count == 3:
+                trips +=1
+        if pairs >= 1 and trips >= 1:
+            return True
+        else:
+            return False
+
 
     def fourCheck(self): #checks for fourofakind
         for card in self.__cardsInDeck:
@@ -165,24 +211,47 @@ class Deck:
     def flushCheck(self): #checks for a flush
         numSame = 0
         suit = self.__cardsInDeck[0].getSuit()
-        for card in self.__cardsInDeck():
+        for card in self.__cardsInDeck:
             if card.getSuit() == suit:
                 numSame +=1
         if numSame == 5:
             return True
         return False
-
-    def straightCheck(self): #checks for a straight
-        sortedDeck = sorted(self.__cardsInDeck)
-        i = 0
+    
+    def straightCheck(self): # Checks for a straight
+        sortedDeck = sorted(self.__cardsInDeck, key=lambda card: card.getValue())
         inSeries = 0
-        while i < len(self.__cardsInDeck):
-            if sortedDeck.getCard(i).getValue() + 1 == sortedDeck.getCard(i+1.).getValue():
-                inSeries +=1
+
+        # check for a normal straight
+        for i in range(len(sortedDeck) - 1):
+            if sortedDeck[i].getValue() + 1 == sortedDeck[i+1].getValue(): 
+                inSeries += 1
             else:
-                return False
-            i += 1
-        return True                        
+                inSeries = 0
+
+        if inSeries >= 4:  # If there are 5 cards in series
+            return True
+
+        # check for Ace low straight
+        for card in sortedDeck:
+            if card.getValue() == 14:  # 14 is the normal value for Ace, doesnt need resetting as cards are binned afterwards
+                card.setValue(1)
+
+        reSortedDeck = sorted(sortedDeck, key=lambda card: card.getValue())
+        inSeries = 0
+
+        for i in range(len(reSortedDeck) - 1):
+            if reSortedDeck[i].getValue() + 1 == reSortedDeck[i+1].getValue(): 
+                inSeries += 1
+            else:
+                inSeries = 0
+        print(inSeries)
+        if inSeries >= 4:  # If there are 5 cards in series  
+            return True
+
+        return False
+    
+             
 
 class Dealer(): #dealer class for creating decks
 
@@ -196,12 +265,7 @@ class Dealer(): #dealer class for creating decks
                 deck.addCard(card)
         return deck
 
-
-
-
-
-
-                                    
+                                   
 
 
 
